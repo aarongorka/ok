@@ -11,40 +11,21 @@ podTemplate(
   ],
 ) {
   node('build') {
-    stage('checkout') {
-      checkout scm
-    }
+    stage('checkout')     { checkout scm }
+    stage('build')        { container('golang') { sh "go build -ldflags -s ok.go" } }
+    stage('test')         { container('golang') { sh "go vet" } }
+    stage('docker build') { container('docker') { sh "docker build -t ${imageUrl} ." } }
 
-    stage('build') {
-      container('golang') {
-        sh """
-          mkdir -p /go/src/github.com/assembyline/ok
-          cp -r . /go/src/github.com/assembyline/ok
-          cd /go/src/github.com/assembyline/ok
-          go build -ldflags -s ok.go
-        """
-
-        sh """
-          cp /go/src/github.com/assembyline/ok/ok .
-        """
-      }
-    }
-
-    stage('docker build') {
-      container('docker') {
-          sh """
-            docker build -t ${imageUrl} .
-          """
-      }
-    }
-
-    stage('docker push') {
-      container('docker') {
-        withCredentials([usernamePassword(credentialsId: 'quay-assemblyline-susan', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-          sh """
-            docker login -u=$USERNAME -p=$PASSWORD quay.io
-            docker push ${imageUrl}
-          """
+    //only deploy master branch to quay repo
+    if (env.BRANCH_NAME == 'master') {
+      stage('docker push') {
+        container('docker') {
+          withCredentials([usernamePassword(credentialsId: 'quay-assemblyline-susan', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+            sh """
+              docker login -u=$USERNAME -p=$PASSWORD quay.io
+              docker push ${imageUrl}
+            """
+          }
         }
       }
     }
