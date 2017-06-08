@@ -1,3 +1,5 @@
+def imageUrl = "quay.io/assemblyline/ok"
+
 podTemplate(
   label: 'build',
   containers: [
@@ -31,8 +33,19 @@ podTemplate(
     stage('docker build') {
       container('docker') {
           sh """
-            docker build -t quay.io/assemblyline/ok .
+            docker build -t ${imageUrl} .
           """
+      }
+    }
+
+    stage('docker push') {
+      container('docker') {
+        withCredentials([usernamePassword(credentialsId: 'quay-assemblyline-susan', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+          sh """
+            docker login -u=$USERNAME -p=$PASSWORD quay.io
+            docker push ${imageUrl}
+          """
+        }
       }
     }
   }
