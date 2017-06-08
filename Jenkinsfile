@@ -12,8 +12,14 @@ podTemplate(
 ) {
   node('build') {
     stage('checkout')     { checkout scm }
-    stage('build')        { container('golang') { sh "go build -ldflags -s ok.go" } }
-    stage('test')         { container('golang') { sh "go vet" } }
+
+    stages = [:]
+
+    stages['build'] = { container('golang') { sh "go build -ldflags -s ok.go" } }
+    stages['test']  = { container('golang') { sh "go vet" } }
+
+    parallel stages
+
     stage('docker build') { container('docker') { sh "docker build -t ${imageUrl} ." } }
 
     //only deploy master branch to quay repo
