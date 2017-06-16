@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A simple service to assist in checking uptime.
+name: ok
+version: 0.1.0
