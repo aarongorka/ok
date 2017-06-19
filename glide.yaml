@@ -1,0 +1,3 @@
+package: github.com/assemblyline/ok
+import:
+- package: github.com/sirupsen/logrus
