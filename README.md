@@ -1,5 +1,4 @@
-# Assemblyline
-## ok
+# ok
 
 A webserver in a (tiny) docker container that returns 200 ok for every request on port 8888
 
@@ -7,7 +6,7 @@ A webserver in a (tiny) docker container that returns 200 ok for every request o
 ## Ready Made
 
 ```
-docker run -p 8888:8888 quay.io/assemblyline/ok
+docker run -p 8888:8888 aarongorka/ok
 ```
 
 ## Build Your Own
@@ -21,5 +20,4 @@ make release
 ## Build Dependencies
 
 * [Docker](http://www.docker.com/)
-* [Go](https://golang.org/)
 * make
